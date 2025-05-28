@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DES Key Generation - Visualizer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header><h1>🔐 DES Key Generation</h1></header>
+
+  <main id="sceneContainer">
+    <!-- Сцена 1 -->
+    <section class="scene active" id="scene-1">
+      <h2>Data Encryption Standard (DES)</h2>
+      <p>Симметричное шифрование: один ключ для шифрования и дешифрования.</p>
+      <p>Цель: показать, как из одного 64-битного ключа получаются 16 раундовых ключей.</p>
+      <div class="icons">🔐 🔑 ➡️ 📦</div>
+      <div class="btn-row">
+        <button class="next-btn" data-next="scene-2">Начать</button>
+      </div>
+    </section>
+
+    <!-- Сцена 2 -->
+    <section class="scene hidden" id="scene-2">
+      <h2>Ввод ключа (64 бита)</h2>
+      <p>Каждый 8-й бит (контрольный) — серым и будет удалён.</p>
+      <input type="text" id="keyInput" maxlength="64" placeholder="Введите ключ (0 и 1)">
+      <div id="bitGrid" class="bit-grid"></div>
+      <div class="btn-row">
+        <button class="back-btn" data-prev="scene-1">Назад</button>
+        <button class="next-btn" data-next="scene-3">Далее</button>
+      </div>
+    </section>
+
+    <!-- Сцена 3 — PC-1 -->
+    <section class="scene hidden" id="scene-3">
+      <h2>PC-1 Перестановка</h2>
+      <p>56 бит упорядочиваются в новой последовательности (таблица PC-1).</p>
+      <div class="pc1-panel">
+        <div id="pc1Table" class="pc1-table"></div>
+        <div id="pc1Grid"></div>
+      </div>
+      <div class="btn-row">
+        <button class="back-btn" data-prev="scene-2">Назад</button>
+        <button id="scene3NextBtn" class="next-btn hidden" data-next="scene-4">Далее</button>
+      </div>
+    </section>
+
+    <!-- Сцена 4 — Деление -->
+    <section class="scene hidden" id="scene-4">
+      <h2>Деление на C0 и D0</h2>
+      <p>56 бит разделяются пополам на <span class="c-label">C0</span> и <span class="d-label">D0</span>.</p>
+      <div id="splitContainer" class="pc1-panel">
+        <div id="scene4Grid" class="bit-grid"></div>
+        <div id="splitGrid" class="split-container">
+          <div id="gridC" class="bit-grid"></div>
+          <div id="gridD" class="bit-grid"></div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="back-btn" data-prev="scene-3">Назад</button>
+        <button id="splitAnimateBtn" class="next-btn">Начать анимацию</button>
+        <button id="scene4NextBtn" class="next-btn hidden" data-next="scene-5">Далее</button>
+      </div>
+    </section>
+
+    <!-- Сцена 5 — Циклические сдвиги -->
+    <section class="scene hidden" id="scene-5">
+        <h2>Циклические сдвиги C и D</h2>
+        <p>В каждом из 16 раундов сдвигаем:</p>
+  
+        <div id="shiftProgress" class="progress-container">
+          <div id="shiftProgressBar" class="progress-bar"></div>
+          <span id="shiftProgressText">Раунд 1 из 16</span>
+        </div>
+  
+        <div class="shift-panel">
+          <div id="shiftTable" class="shift-table"></div>
+          <div id="shiftGrid" class="pc1-panel">
+            <div id="cGrid" class="bit-grid"></div>
+            <div id="dGrid" class="bit-grid"></div>
+          </div>
+        </div>
+  
+        <div class="btn-row">
+          <button class="back-btn" data-prev="scene-4">Назад</button>
+          <button id="shiftStepBtn" class="next-btn">Следующий раунд</button>
+          <button id="scene5NextBtn" class="next-btn hidden" data-next="scene-6">Далее</button>
+        </div>
+      </section>
+
+<!-- ========== СЦЕНА 6 ========== -->
+<section class="scene hidden" id="scene-6">
+    <h2>Генерация раундового ключа (PC-2)</h2>
+    <p>Объединяем C и D &rarr; применяем перестановку PC-2 &rarr; получаем 48-битный ключ Kₙ.</p>
+    <div id="scene6Wrap" class="scene6-wrap">
+      <div>
+        <div class="cd-label">C<span class="c-label"> (28)</span> | D<span class="d-label"> (28)</span></div>
+        <div id="scene6CD" class="bit-grid scene6-cd"></div>
+      </div>
+      <div>
+        <div class="pc2-label">Таблица PC-2</div>
+        <div id="scene6PC2Table" class="pc2-table"></div>
+      </div>
+      <div>
+        <div class="key-label">K<span id="scene6KeyNum">₁</span> (48)</div>
+        <div id="scene6Key" class="bit-grid scene6-key"></div>
+      </div>
+    </div>
+    <div class="scene6-btns">
+      <button class="back-btn" data-prev="scene-5">Назад</button>
+      <button id="scene6SkipBtn" class="next-btn">Пропустить анимацию</button>
+      <button id="scene6NextBtn" class="next-btn" data-next="scene-6">Следующий ключ</button>
+      <button id="scene6ToFinalBtn" class="next-btn hidden" data-next="scene-7">Далее</button>
+    </div>
+  </section>
+
+  <!-- Сцена 7 -->
+<section class="scene hidden" id="scene-7">
+    <h2>Все 16 раундовых ключей (готово)</h2>
+    <p>Генерируем 16 ключей: K₁, K₂, …, K₁₆.<br>
+       Используются при шифровании. При дешифровании — в обратном порядке.</p>
+    
+    <div id="scene7Grid" class="scene7-grid"></div>
+    
+    <div class="btn-row">
+        <button class="back-btn" data-prev="scene-6">Назад</button>
+        <button class="next-btn" data-next="scene-8">Далее — Этап 2</button>
+      </div>
+  </section>
+
+<!-- Сцена 8 — Начало шифрования -->
+<section class="scene hidden" id="scene-8">
+    <h2>Начало шифрования</h2>
+    <p>📩 Входное сообщение: 64 бита<br>
+       Применяется начальная перестановка (IP)</p>
+  
+    <input type="text"
+           id="scene8InputField"
+           maxlength="64"
+           placeholder="Введите 64-битное сообщение (0 и 1)"
+           style="width: 100%; max-width:400px; font-family: monospace; text-align:center; margin-bottom:16px;">
+    <button id="scene8LoadBtn" class="next-btn">Загрузить сообщение</button>
+  
+    <div id="scene8Wrap" class="scene8-wrap" style="visibility:hidden;">
+      <div id="scene8Input" class="bit-grid"></div>
+      <div id="scene8IPTable" class="ip-table"></div>
+      <div id="scene8Output" class="bit-grid"></div>
+    </div>
+  
+    <div id="scene8Split" class="scene8-split" style="visibility:hidden;">
+      <div>
+        <div class="c-label">L₀ (32)</div>
+        <div id="scene8L0" class="bit-grid"></div>
+      </div>
+      <div>
+        <div class="d-label">R₀ (32)</div>
+        <div id="scene8R0" class="bit-grid"></div>
+      </div>
+    </div>
+  
+    <div class="btn-row">
+      <button class="back-btn" data-prev="scene-7">Назад</button>
+      <button id="scene8NextBtn" class="next-btn hidden" data-next="scene-9">Далее</button>
+    </div>
+  </section>
+  
+<!-- ==================== Сцена 9 — Раундовая структура ==================== -->
+<section class="scene hidden" id="scene-9">
+    <h2>
+      Раунд <span id="roundNum">1</span> (1 ≤ i ≤ 16)
+    </h2>
+    <p>
+      Используем раундовый ключ 
+      <strong>K<span id="roundIndex">1</span></strong> (48 бит)
+    </p>
+
+    <div id="scene9KeyBits" class="bit-grid scene9-48 key-grid"></div>
+  
+    <div class="scene9-header">
+      <div class="steps-bar">
+        <div class="step" data-step="1">1. Expand</div>
+        <div class="step" data-step="2">2. XOR₄₈</div>
+        <div class="step" data-step="3">3. S-блоки</div>
+        <div class="step" data-step="4">4. P-perm</div>
+        <div class="step" data-step="5">5. XOR₂</div>
+        <div class="step" data-step="6">6. Swap</div>
+      </div>
+    </div>
+  
+    <div class="scene9-controls">
+      <button id="pauseBtn">Пауза</button>
+      <button id="resumeBtn" class="hidden">Возобновить</button>
+    </div>
+  
+    <div class="formula">
+      <span>L<sub>i</sub> = </span>
+      <span class="highlight-none">R<sub>i-1</sub> ⊕ f(·)</span>
+    </div>
+  
+    <div id="scene9Wrap" class="scene9-wrap">
+      <div id="scene9R" class="bit-grid scene9-32"></div>
+      <div id="scene9E" class="ip-table scene9-48"></div>
+      <div id="scene9XOR" class="bit-grid scene9-48"></div>
+      <div id="scene9SBoxes" class="scene9-sboxes"></div>
+      <div id="scene9P" class="bit-grid scene9-32"></div>
+      <div id="scene9XOR2" class="bit-grid scene9-32"></div>
+      <div id="scene9L" class="bit-grid scene9-32"></div>
+    </div>
+  
+    <div class="scene9-btns btn-row">
+      <button class="back-btn" data-prev="scene-8">Назад</button>
+      <button id="scene9NextBtn" class="step-btn">Шаг 1: Expand</button>
+      <button id="scene9NextRoundBtn" class="next-btn hidden">
+        Следующий раунд
+      </button>
+      <button id="scene9ToFinalBtn" class="next-btn hidden" data-next="scene-10">
+        Далее
+      </button>
+    </div>
+  </section>
+  
+  
+  
+  <!-- ==================== Сцена 10 — Финал шифрования ==================== -->
+<section class="scene hidden" id="scene-10">
+    <h2>Финал шифрования</h2>
+    <p>
+      🔄 После 16 раунда:<br>
+      • Объединяем <strong>R₁₆</strong> и <strong>L₁₆</strong><br>
+      • Применяем финальную перестановку (<strong>IP⁻¹</strong>)
+    </p>
+  
+    <div class="scene10-wrap">
+      <div id="scene10RL" class="bit-grid scene9-32" title="R₁₆‖L₁₆"></div>
+  
+      <div id="scene10IPinv" class="ip-table"></div>
+  
+      <div id="scene10Cipher" class="bit-grid scene9-32" style="visibility:hidden;">
+      </div>
+    </div>
+  
+    <div class="btn-row" style="margin-top:20px;">
+      <button class="back-btn" data-prev="scene-9">Назад</button>
+      <button id="scene10StepBtn" class="next-btn">Шаг: IP⁻¹</button>
+      <button id="scene10DoneBtn" class="next-btn hidden">✅ DES Complete</button>
+    </div>
+  </section>
+  
+  <!-- ==================== Сцена 11 — Заключение ==================== -->
+<section class="scene hidden" id="scene-11">
+    <h2>Заключение</h2>
+  
+    <ul class="conclusion-list">
+      <li>✔️ Один ключ → 16 раундовых</li>
+      <li>✔️ 16 раундов обработки</li>
+      <li>✔️ S-блоки, перестановки, XOR</li>
+      <li>✔️ Симметричный: шифрование и дешифрование — одинаково, только ключи в обратном порядке</li>
+    </ul>
+  
+    <div class="btn-row">
+      <button class="back-btn" data-prev="scene-10">Назад</button>
+      <button class="next-btn" data-next="scene-12">🟢 Дешифрование</button>
+    </div>
+  </section>
+  
+  </main>
+
+  <footer><p style="text-align:center;color:#666;margin-top:40px;">© 2025 DES Visualizer</p></footer>
+  <script type="module" src="main.js"></script>
+</body>
+</html>
