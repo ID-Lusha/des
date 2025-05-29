@@ -1,0 +1,677 @@
+/*---------------- Переменные темы ----------------*/
+:root {
+    --bg-dark:   #0f0f0f;   
+    --text-light:#e0e0e0; 
+    --c-color:   #0077ff;  
+    --d-color:   #a34ef4;   
+    --green:     #00ff88;   
+    --gray:      #333;     
+    --transition:0.3s ease; 
+  }
+  
+  /*---------------- Базовые стили документа ----------------*/
+  body {
+    margin: 0;        
+    padding: 0;
+    background: var(--bg-dark);
+    color:      var(--text-light);
+    font-family:'Segoe UI', sans-serif;
+  }
+  
+  header {
+    background: #1a1a1a;
+    text-align: center;
+    padding: 20px;
+    color: var(--green);
+  }
+  
+  main {
+    max-width: 960px;
+    margin: auto;          
+    padding: 40px 20px;
+  }
+  
+  .scene {
+    display:         none;          
+    flex-direction:  column;
+    align-items:     center;
+    animation:       fadeIn .4s ease forwards; 
+  }
+  .scene.active { display:flex; }             
+  .scene.hidden {  display:none!important; }  
+  
+  @keyframes fadeIn {
+    from { opacity:0; transform:translateY(10px); }
+    to   { opacity:1; transform:translateY(0);  }
+  }
+  
+  .icons {
+    font-size: 2rem;
+    display:    flex;
+    gap:        1rem;
+    margin:     20px 0;
+  }
+  
+  .next-btn {
+    margin-top: 30px;
+    padding:    12px 24px;
+    background: var(--green);
+    border:     none;
+    border-radius: 8px;
+    font-weight:   bold;
+    cursor:        pointer;
+    transition:    background var(--transition);
+  }
+  .next-btn:hover { background:#00cc66; }
+  
+  .back-btn {
+    margin-top: 30px;
+    padding:    12px 24px;
+    background: #555;           
+    border:     none;
+    border-radius: 8px;
+    font-weight:   bold;
+    color:         var(--text-light);
+    cursor:        pointer;
+    transition:    background var(--transition);
+  }
+  .back-btn:hover { background:#777; }
+  
+  #bitGrid,
+  .bit-grid {
+    display:             grid;
+    grid-template-columns: repeat(8,1fr);
+    gap:                 6px;
+    margin-top:          20px;
+  }
+  
+  .bit-cell {
+    width:     32px;
+    height:    32px;
+    display:   flex;
+    align-items:    center;
+    justify-content:center;
+    font-family: monospace;
+    border-radius: 6px;
+    transition:     background var(--transition), transform var(--transition);
+  }
+  .bit-green  { background: var(--green);  color:black; }
+  .bit-gray   { background: var(--gray);   color:white; }
+  .bit-yellow { background: gold;          color:black; }
+  
+  #pc1Grid {
+    display:      flex;
+    gap:          80px;
+    margin-top:   30px;
+    position:     relative; 
+  }
+  .pc1-panel {
+    display:      flex;
+    gap:          40px;
+    margin-top:   20px;
+    position:     relative;
+  }
+  
+  .pc1-table {
+    display: grid;
+    grid-template-columns: repeat(8, 24px);
+    gap: 4px;
+  }
+  .pc1-table div {
+    width:  24px;
+    height: 24px;
+    font-size: 12px;
+    text-align: center;
+    line-height: 24px;
+    color: var(--text-light);
+    background: #222;
+    border-radius: 4px;
+  }
+  
+  .split-container {
+    display: flex;
+    gap:     40px;
+    margin-top: 20px;
+  }
+  .split-container {
+    display: flex;
+    gap:     40px;
+  }
+  
+  .c-label { color: var(--c-color); font-weight:bold; }
+  .d-label { color: var(--d-color); font-weight:bold; }
+  .c-bit   { background: var(--c-color); color:black; }
+  .d-bit   { background: var(--d-color); color:white; }
+  
+  .moving-bit {
+    position:   absolute;          
+    width:      32px;
+    height:     32px;
+    display:    flex;
+    align-items:    center;
+    justify-content:center;
+    font-family: monospace;
+    font-weight: bold;
+    background: gold;
+    color:      black;
+    border-radius: 6px;
+    pointer-events: none;            
+    transition: transform 0.3s ease-in-out; 
+  }
+  .moving-bit {
+    transition: transform 0.6s ease-in-out;
+  }
+  
+  /*---------------- Сцена 5: циклические сдвиги ----------------*/
+  .shift-panel {
+    display:    flex;
+    gap:        40px;
+    align-items:flex-start;
+    margin-top: 20px;
+  }
+  .shift-table {
+    display: grid;
+    grid-template-columns: repeat(16,24px);
+    gap: 4px;
+  }
+  .shift-table div {
+    width: 24px; height:24px;
+    font-size: 12px;
+    text-align: center;
+    line-height:24px;
+    background: #222;
+    color: var(--text-light);
+    border-radius:4px;
+  }
+  .shift-current {
+    background: var(--green) !important;
+    color: black    !important;
+  }
+  #shiftGrid {
+    display: flex;
+    gap:     60px;
+    position: relative;
+    margin-top:20px;
+  }
+  #cGrid, #dGrid {
+    display: grid;
+    grid-template-columns: repeat(8,32px);
+    gap: 6px;
+    margin-top:10px;
+  }
+  
+  .progress-container {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    height:20px;
+    background:#333;
+    border-radius:10px;
+    overflow:hidden;
+    margin: 20px auto;
+  }
+  .progress-bar {
+    position:absolute;
+    left:0; top:0;
+    height:100%;
+    width:0%;
+    background: var(--green);
+    transition: width 0.3s ease;
+  }
+  #shiftProgressText {
+    display:block;
+    text-align:center;
+    margin-top:6px;
+    font-size:14px;
+    color: var(--text-light);
+  }
+  
+  /*---------------- Сцена 6: PC-2 ----------------*/
+  .scene6-wrap {
+    display: flex;
+    gap: 60px;
+    align-items:flex-start;
+    justify-content:center;
+    margin:30px 0 20px;
+    position: relative;  
+    overflow: hidden;   
+  }
+  .scene6-cd {
+    display: grid;
+    grid-template-columns: repeat(7,32px);
+    gap:6px;
+  }
+  .scene6-key {
+    display: grid;
+    grid-template-columns: repeat(8,32px);
+    gap:6px;
+  }
+  .pc2-table {
+    display: grid;
+    grid-template-columns: repeat(8,24px);
+    gap:4px;
+    background:#181818;
+    padding:12px 10px;
+    border-radius:8px;
+    margin-top:8px;
+  }
+  .pc2-table div {
+    width:24px; height:24px;
+    font-size:12px;
+    color:#88faff;
+    text-align:center;
+    line-height:24px;
+    border-radius:4px;
+  }
+  .scene6-btns {
+    margin-top:30px;
+    display:flex;
+    gap:16px;
+    justify-content:center;
+  }
+  .scene6-key .bit-cell.active {
+    background: gold !important;
+    color: #333 !important;
+  }
+  
+  @keyframes border-glow {
+    0%,100% { box-shadow: none; }
+    50%     { box-shadow: 0 0 0 3px rgb(255,225,0); }
+  }
+  .bit-cell.glow {
+    animation: border-glow 0.75s ease-in-out forwards;
+  }
+  
+  /*---------------- Сцена 7: вывод 16 ключей ----------------*/
+  .scene7-grid {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap:12px;
+    margin-top:20px;
+  }
+  .scene7-grid .key-cell {
+    background:#222;
+    padding:8px;
+    border-radius:6px;
+    font-family:monospace;
+    font-size:12px;
+    color: var(--text-light);
+    white-space:pre-line; 
+    overflow: visible;
+    text-overflow: clip;
+  }
+  .scene7-grid .key-cell.active {
+    opacity:1;
+  }
+  
+  /*---------------- Сцена 8: Initial Permutation ----------------*/
+  .scene8-wrap {
+    display:flex;
+    gap:40px;
+    align-items:flex-start;
+    justify-content:center;
+    position: relative; 
+    margin-top:20px;
+  }
+  .ip-table {
+    display:grid;
+    grid-template-columns: repeat(8,24px);
+    gap:4px;
+    background:#181818;
+    padding:8px;
+    border-radius:6px;
+  }
+  .ip-table div {
+    width:24px; height:24px;
+    font-size:12px;
+    color:#88faff;
+    text-align:center;
+    line-height:24px;
+  }
+  .scene8-split {
+    display:flex;
+    gap:60px;
+    margin:30px 0;
+  }
+  #scene8L0 .bit-cell { background: var(--c-color); }
+  #scene8R0 .bit-cell { background: var(--d-color); }
+  
+  /* ===== Сцена 9: Раундовая структура ===== */
+
+.scene9-header {
+  margin-bottom: 12px;
+}
+.steps-bar {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+}
+.steps-bar .step {
+  flex: 1;
+  text-align: center;
+  padding: 4px 0;
+  background: #333;
+  color: var(--text-light);
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+.steps-bar .step:hover,
+.steps-bar .step.active {
+  background: var(--green);
+  color: black;
+}
+
+.scene9-controls {
+  margin-bottom: 12px;
+}
+.scene9-controls button {
+  margin-right: 8px;
+  padding: 4px 8px;
+  background: #555;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background var(--transition);
+}
+.scene9-controls button:hover {
+  background: #666;
+}
+
+.formula {
+  text-align: center;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+.formula .highlight {
+  background: rgba(0, 255, 136, 0.2);
+  border-radius: 2px;
+}
+
+#scene9Wrap {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-content: flex-start;
+  align-items: flex-start;
+  margin:30px 0 20px;
+
+}
+
+.bit-grid {
+  display: grid;
+  gap: 6px;
+}
+.scene9-32 {
+  grid-template-columns: repeat(8, 32px);
+}
+.scene9-48 {
+  grid-template-columns: repeat(8, 32px);
+  display: grid;
+}
+
+.scene9-sboxes {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin: 12px 0;
+}
+.scene9-sboxes .sbox {
+  background: #181818;
+  padding: 8px;
+  border-radius: 6px;
+  color: var(--text-light);
+  font-size: 12px;
+}
+.scene9-sboxes .sbox .title {
+  text-align: center;
+  margin-bottom: 4px;
+  color: var(--green);
+}
+
+.scene9-btns.btn-row {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.moving-bit {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: monospace;
+  font-weight: bold;
+  background: gold;
+  color: black;
+  border-radius: 6px;
+  pointer-events: none;
+  transition: transform 0.5s ease-in-out;
+}
+
+.hidden {
+  display: none !important;
+}
+#scene9E .bit-cell.bit-gray {
+    background: #2f2f2f;  
+    color:      #888;     
+  }
+  
+  #scene9E .bit-cell.bit-green {
+    background: #009933; 
+    color:      #fff;   
+    font-weight: bold;
+  }
+#scene9XOR .bit-cell,
+#scene9XOR2 .bit-cell {
+  width: 40px;        
+  min-width: 40px;
+  font-size: 12px;    
+  line-height: 1;    
+}
+
+#scene9XOR,
+#scene9XOR2 {
+  grid-template-columns: repeat(8, 40px);
+}
+
+
+
+
+.scene10-wrap {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+    justify-content: center;
+    position: relative;
+    margin: 30px 0;
+  }
+  
+  #scene10Concat,
+  #scene10Output {
+    display: grid;
+    grid-template-columns: repeat(8, 32px);
+    gap: 6px;
+  }
+  
+  #scene10IPTable {
+    display: grid;
+    grid-template-columns: repeat(8, 24px);
+    gap: 4px;
+    background: #181818;
+    padding: 8px;
+    border-radius: 6px;
+  }
+  
+  .complete-msg {
+    margin-top: 20px;
+    font-size: 1.2rem;
+    color: var(--green);
+    text-align: center;
+  }
+  
+  
+  
+#scene-11 {
+    text-align: center;
+    padding: 40px 20px;
+  }
+  #scene-11 h2 {
+    margin-bottom: 24px;
+    font-size: 1.8rem;
+    color: var(--green);
+  }
+  #scene-11 .conclusion-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto 32px;
+    max-width: 400px;
+    text-align: left;
+  }
+  #scene-11 .conclusion-list li {
+    position: relative;
+    padding-left: 1.8em;
+    margin-bottom: 12px;
+    font-size: 1rem;
+    line-height: 1.4;
+    color: var(--text-light);
+  }
+  #scene-11 .conclusion-list li::before {
+    content: "✔️";
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 1.1rem;
+  }
+  #scene-11 .btn-row {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+  }
+
+
+/* ============================================================================
+   Сцена 12 — Дешифрование (аналог сцены 9)
+   =========================================================================== */
+
+.scene12-header {
+    margin-bottom: 12px;
+  }
+  .scene12-header .steps-bar {
+    display: flex;
+    justify-content: space-between;
+    gap: 4px;
+  }
+  .scene12-header .step {
+    flex: 1;
+    text-align: center;
+    padding: 4px 0;
+    background: #333;
+    color: var(--text-light);
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background var(--transition), color var(--transition);
+  }
+  .scene12-header .step:hover,
+  .scene12-header .step.active {
+    background: var(--green);
+    color: black;
+  }
+  
+  .scene12-controls {
+    margin-bottom: 12px;
+  }
+  .scene12-controls button {
+    margin-right: 8px;
+    padding: 4px 8px;
+    background: #555;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background var(--transition);
+  }
+  .scene12-controls button:hover {
+    background: #666;
+  }
+  
+  #scene12KeyBits {
+    display: grid;
+    grid-template-columns: repeat(8, var(--bit-size));
+    gap: 6px;
+    margin: 12px 0;
+  }
+  
+  #scene12Wrap {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-content: flex-start;
+    align-items: flex-start;
+    margin: 20px 0 30px;
+  }
+  
+  .scene12-32 { grid-template-columns: repeat(8, var(--bit-size)); }
+  .scene12-48 { grid-template-columns: repeat(8, var(--bit-size)); }
+  .scene12-sboxes {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 12px 0;
+  }
+  .scene12-sboxes .sbox {
+    background: #181818;
+    padding: 8px;
+    border-radius: 6px;
+    color: var(--text-light);
+    font-size: 12px;
+  }
+  .scene12-sboxes .title {
+    text-align: center;
+    margin-bottom: 4px;
+    color: var(--green);
+  }
+  
+  #scene12E .bit-cell.bit-gray {
+    background: #2f2f2f;
+    color: #888;
+  }
+  #scene12E .bit-cell.bit-green {
+    background: #009933;
+    color: #fff;
+    font-weight: bold;
+  }
+  
+  #scene12XOR .bit-cell,
+  #scene12XOR2 .bit-cell {
+    width: 40px;
+    min-width: 40px;
+    font-size: 12px;
+    line-height: 1;
+  }
+  #scene12XOR,
+  #scene12XOR2 {
+    grid-template-columns: repeat(8, 40px);
+  }
+  
+  .scene12-btns {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 20px;
+  }
+  
+  .hidden { display: none !important; }
+  
